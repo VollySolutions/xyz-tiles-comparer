@@ -12,6 +12,12 @@
       href="https://unpkg.com/maplibre-gl@1.14.0-rc.1/dist/maplibre-gl.css"
       rel="stylesheet"
     />
+    <script src="https://rawcdn.githack.com/maplibre/maplibre-gl-compare/fd86addd6a666f833629ae29c4ef09ff36538662/dist/maplibre-gl-compare.js?min=1"></script>
+    <link
+      rel="stylesheet"
+      href="https://rawcdn.githack.com/maplibre/maplibre-gl-compare/fd86addd6a666f833629ae29c4ef09ff36538662/dist/maplibre-gl-compare.css?min=1"
+      type="text/css"
+    />
     <style>
       body {
         margin: 0;
@@ -48,12 +54,7 @@
         width: 100%;
       }
     </style>
-    <script src="https://rawcdn.githack.com/astridx/astridx.github.io/a9d7297a4fe1e3a4d7ebeb1e4e662fd1339ef3b5/maplibreexamples/plugins/maplibre-gl-compare.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://rawcdn.githack.com/astridx/astridx.github.io/a9d7297a4fe1e3a4d7ebeb1e4e662fd1339ef3b5/maplibreexamples/plugins/maplibre-gl-compare.css"
-      type="text/css"
-    />
+
     <div id="comparison-container">
       <div id="before" class="map"></div>
       <div id="after" class="map"></div>
@@ -78,7 +79,7 @@
               type: "raster",
               source: "raster-tiles",
               minzoom: 0,
-              maxzoom: 22,
+              maxzoom: 20,
             },
           ],
         },
@@ -94,11 +95,10 @@
             "raster-tiles1": {
               type: "raster",
               tiles: [
-                // "https://tile-server.nas.vollysolutions.com/{z}/{x}/{y}.png",
-                "https://tiles-cdn.koordinates.com/services;key=/tiles/v4/layer=104772/EPSG:3857/{z}/{x}/{y}.png"
+                "https://tile-server.nas.vollysolutions.com/{z}/{x}/{y}.png",
               ],
               tileSize: 256,
-            //   scheme: "tms",
+              scheme: "tms",
             },
           },
           layers: [
@@ -107,7 +107,7 @@
               type: "raster",
               source: "raster-tiles1",
               minzoom: 0,
-              maxzoom: 22,
+              maxzoom: 20,
             },
           ],
         },
