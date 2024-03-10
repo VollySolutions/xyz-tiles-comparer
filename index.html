@@ -48,31 +48,72 @@
     </div>
 
     <script>
+      /*
+        Map config format:
+        {
+            // Single source https://maplibre.org/maplibre-style-spec/sources/
+            "before": {
+
+            },
+            "after": {
+
+            },
+            "center": [175.52436631107616, -37.65870903235669],
+            "zoom": 15
+        }
+        */
+
+      const defaultConfig = {
+        before: {
+          type: "raster",
+          tiles: [
+            // Get an API key from https://basemaps.linz.govt.nz/
+            "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+          ],
+          tileSize: 256,
+        },
+        after: {
+          type: "raster",
+          tiles: [
+            "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+          ],
+          tileSize: 256,
+        },
+        center: [175.52436631107616, -37.65870903235669],
+        zoom: 15,
+      };
+
+      let config = defaultConfig;
+      const providedConfig = new URLSearchParams(window.location.search).get(
+        "config"
+      );
+      if (providedConfig !== null) {
+        config = JSON.parse(atob(providedConfig));
+      } else {
+        const newQueryString = new URLSearchParams(window.location.search);
+        newQueryString.set("config", btoa(JSON.stringify(config)));
+        window.location.search = newQueryString.toString();
+      }
+
       const beforeMap = new maplibregl.Map({
         container: "before",
         style: {
           version: 8,
           sources: {
-            "tiles": {
-              type: "raster",
-              tiles: [
-                "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
-              ],
-              tileSize: 256,
-            },
+            beforeSource: config.before,
           },
           layers: [
             {
               id: "1",
               type: "raster",
-              source: "tiles",
+              source: "beforeSource",
               minzoom: 0,
               maxzoom: 20,
             },
           ],
         },
-        center: [175.52436631107616, -37.65870903235669],
-        zoom: 15,
+        center: config.center,
+        zoom: config.zoom,
       });
 
       const afterMap = new maplibregl.Map({
@@ -80,27 +121,20 @@
         style: {
           version: 8,
           sources: {
-            "tiles": {
-              type: "raster",
-              tiles: [
-                "https://tile-server.nas.vollysolutions.com/{z}/{x}/{y}.png",
-              ],
-              tileSize: 256,
-              scheme: "tms",
-            },
+            afterSource: config.after,
           },
           layers: [
             {
               id: "1",
               type: "raster",
-              source: "tiles",
+              source: "afterSource",
               minzoom: 0,
               maxzoom: 20,
             },
           ],
         },
-        center: [175.52436631107616, -37.65870903235669],
-        zoom: 15,
+        center: config.center,
+        zoom: config.zoom,
       });
 
       const map = new maplibregl.Compare(
