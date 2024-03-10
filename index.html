@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Swipe between maps</title>
+    <title>Map Comparison</title>
     <meta
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
@@ -22,6 +22,7 @@
     <style>
       body {
         overflow: hidden;
+        margin: 0;
       }
 
       body * {
@@ -48,6 +49,72 @@
     </div>
 
     <script>
+      let currentMapsAndControls = [];
+
+      const setUpMapsAndControls = (config) => {
+        const beforeMap = new maplibregl.Map({
+          container: "before",
+          style: {
+            version: 8,
+            sources: {
+              beforeSource: config.before,
+            },
+            layers: [
+              {
+                id: "1",
+                type: "raster",
+                source: "beforeSource",
+                minzoom: 0,
+                maxzoom: 20,
+              },
+            ],
+          },
+          center: config.center,
+          zoom: config.zoom,
+        });
+        currentMapsAndControls.push(beforeMap);
+
+        const afterMap = new maplibregl.Map({
+          container: "after",
+          style: {
+            version: 8,
+            sources: {
+              afterSource: config.after,
+            },
+            layers: [
+              {
+                id: "1",
+                type: "raster",
+                source: "afterSource",
+                minzoom: 0,
+                maxzoom: 20,
+              },
+            ],
+          },
+          center: config.center,
+          zoom: config.zoom,
+        });
+        currentMapsAndControls.push(afterMap);
+
+        const map = new maplibregl.Compare(
+          beforeMap,
+          afterMap,
+          "#comparison-container"
+        );
+        currentMapsAndControls.push(map);
+      };
+
+      const clearMapsAndControls = () => {
+        currentMapsAndControls.forEach((x) => x.remove());
+        currentMapsAndControls = [];
+      };
+
+      const setQueryString = (config) => {
+        const newQueryString = new URLSearchParams(window.location.search);
+        newQueryString.set("config", btoa(JSON.stringify(config)));
+        window.location.search = newQueryString.toString();
+      };
+
       /*
         Map config format:
         {
@@ -83,65 +150,26 @@
         zoom: 15,
       };
 
-      let config = defaultConfig;
       const providedConfig = new URLSearchParams(window.location.search).get(
         "config"
       );
       if (providedConfig !== null) {
-        config = JSON.parse(atob(providedConfig));
+        const parsedProvidedConfig = JSON.parse(atob(providedConfig));
+        setUpMapsAndControls(parsedProvidedConfig);
       } else {
-        const newQueryString = new URLSearchParams(window.location.search);
-        newQueryString.set("config", btoa(JSON.stringify(config)));
-        window.location.search = newQueryString.toString();
+        setQueryString(defaultConfig);
+        setUpMapsAndControls(defaultConfig);
       }
 
-      const beforeMap = new maplibregl.Map({
-        container: "before",
-        style: {
-          version: 8,
-          sources: {
-            beforeSource: config.before,
-          },
-          layers: [
-            {
-              id: "1",
-              type: "raster",
-              source: "beforeSource",
-              minzoom: 0,
-              maxzoom: 20,
-            },
-          ],
-        },
-        center: config.center,
-        zoom: config.zoom,
+      document.addEventListener("keyup", (event) => {
+        if (event.code === "KeyC") {
+          const answer = window.prompt("Paste JSON config");
+          const answerConfig = JSON.parse(answer);
+          clearMapsAndControls();
+          setUpMapsAndControls(answerConfig);
+          setQueryString(answerConfig);
+        }
       });
-
-      const afterMap = new maplibregl.Map({
-        container: "after",
-        style: {
-          version: 8,
-          sources: {
-            afterSource: config.after,
-          },
-          layers: [
-            {
-              id: "1",
-              type: "raster",
-              source: "afterSource",
-              minzoom: 0,
-              maxzoom: 20,
-            },
-          ],
-        },
-        center: config.center,
-        zoom: config.zoom,
-      });
-
-      const map = new maplibregl.Compare(
-        beforeMap,
-        afterMap,
-        "#comparison-container"
-      );
     </script>
   </body>
 </html>
