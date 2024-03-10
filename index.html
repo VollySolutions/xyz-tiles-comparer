@@ -18,22 +18,7 @@
       href="https://rawcdn.githack.com/maplibre/maplibre-gl-compare/fd86addd6a666f833629ae29c4ef09ff36538662/dist/maplibre-gl-compare.css?min=1"
       type="text/css"
     />
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
 
-      #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
-    </style>
-  </head>
-
-  <body>
     <style>
       body {
         overflow: hidden;
@@ -54,18 +39,21 @@
         width: 100%;
       }
     </style>
+  </head>
 
+  <body>
     <div id="comparison-container">
       <div id="before" class="map"></div>
       <div id="after" class="map"></div>
     </div>
+
     <script>
-      var beforeMap = new maplibregl.Map({
+      const beforeMap = new maplibregl.Map({
         container: "before",
         style: {
           version: 8,
           sources: {
-            "raster-tiles": {
+            "tiles": {
               type: "raster",
               tiles: [
                 "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
@@ -75,9 +63,9 @@
           },
           layers: [
             {
-              id: "simple-tiles",
+              id: "1",
               type: "raster",
-              source: "raster-tiles",
+              source: "tiles",
               minzoom: 0,
               maxzoom: 20,
             },
@@ -87,12 +75,12 @@
         zoom: 15,
       });
 
-      var afterMap = new maplibregl.Map({
+      const afterMap = new maplibregl.Map({
         container: "after",
         style: {
           version: 8,
           sources: {
-            "raster-tiles1": {
+            "tiles": {
               type: "raster",
               tiles: [
                 "https://tile-server.nas.vollysolutions.com/{z}/{x}/{y}.png",
@@ -103,9 +91,9 @@
           },
           layers: [
             {
-              id: "simple-tiles1",
+              id: "1",
               type: "raster",
-              source: "raster-tiles1",
+              source: "tiles",
               minzoom: 0,
               maxzoom: 20,
             },
@@ -115,13 +103,11 @@
         zoom: 15,
       });
 
-      // A selector or reference to HTML element
-      var container = "#comparison-container";
-
-      var map = new maplibregl.Compare(beforeMap, afterMap, container, {
-        // Set this to enable comparing two maps by mouse movement:
-        // m ousemove: true
-      });
+      const map = new maplibregl.Compare(
+        beforeMap,
+        afterMap,
+        "#comparison-container"
+      );
     </script>
   </body>
 </html>
