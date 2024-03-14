@@ -115,22 +115,8 @@
         window.location.search = newQueryString.toString();
       };
 
-      /*
-        Map config format:
-        {
-            // Single source https://maplibre.org/maplibre-style-spec/sources/
-            "before": {
-
-            },
-            "after": {
-
-            },
-            "center": [175.52436631107616, -37.65870903235669],
-            "zoom": 15
-        }
-        */
-
       const defaultConfig = {
+        // Single source https://maplibre.org/maplibre-style-spec/sources/
         before: {
           type: "raster",
           tiles: [
