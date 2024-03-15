@@ -54,21 +54,7 @@
       const setUpMapsAndControls = (config) => {
         const beforeMap = new maplibregl.Map({
           container: "before",
-          style: {
-            version: 8,
-            sources: {
-              beforeSource: config.before,
-            },
-            layers: [
-              {
-                id: "1",
-                type: "raster",
-                source: "beforeSource",
-                minzoom: 0,
-                maxzoom: 20,
-              },
-            ],
-          },
+          style: config.leftMapStyle,
           center: config.center,
           zoom: config.zoom,
         });
@@ -76,21 +62,7 @@
 
         const afterMap = new maplibregl.Map({
           container: "after",
-          style: {
-            version: 8,
-            sources: {
-              afterSource: config.after,
-            },
-            layers: [
-              {
-                id: "1",
-                type: "raster",
-                source: "afterSource",
-                minzoom: 0,
-                maxzoom: 20,
-              },
-            ],
-          },
+          style: config.rightMapStyle,
           center: config.center,
           zoom: config.zoom,
         });
@@ -116,21 +88,49 @@
       };
 
       const defaultConfig = {
-        // Single source https://maplibre.org/maplibre-style-spec/sources/
-        before: {
-          type: "raster",
-          tiles: [
-            // Get an API key from https://basemaps.linz.govt.nz/
-            "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+        // MapLibre map style https://maplibre.org/maplibre-style-spec/root/
+        leftMapStyle: {
+          version: 8,
+          sources: {
+            leftSource: {
+              type: "raster",
+              tiles: [
+                // Get an API key from https://basemaps.linz.govt.nz/
+                "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+              ],
+              tileSize: 256,
+            },
+          },
+          layers: [
+            {
+              id: "1",
+              type: "raster",
+              source: "leftSource",
+              minzoom: 0,
+              maxzoom: 20,
+            },
           ],
-          tileSize: 256,
         },
-        after: {
-          type: "raster",
-          tiles: [
-            "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+        rightMapStyle: {
+          version: 8,
+          sources: {
+            rightSource: {
+              type: "raster",
+              tiles: [
+                "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+              ],
+              tileSize: 256,
+            },
+          },
+          layers: [
+            {
+              id: "1",
+              type: "raster",
+              source: "rightSource",
+              minzoom: 0,
+              maxzoom: 20,
+            },
           ],
-          tileSize: 256,
         },
         center: [175.52436631107616, -37.65870903235669],
         zoom: 15,
