@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Map Comparison</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://unpkg.com/maplibre-gl@1.14.0-rc.1/dist/maplibre-gl.js"></script>
+    <link
+      href="https://unpkg.com/maplibre-gl@1.14.0-rc.1/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://rawcdn.githack.com/maplibre/maplibre-gl-compare/fd86addd6a666f833629ae29c4ef09ff36538662/dist/maplibre-gl-compare.js?min=1"></script>
+    <link
+      rel="stylesheet"
+      href="https://rawcdn.githack.com/maplibre/maplibre-gl-compare/fd86addd6a666f833629ae29c4ef09ff36538662/dist/maplibre-gl-compare.css?min=1"
+      type="text/css"
+    />
+
+    <style>
+      body {
+        overflow: hidden;
+        margin: 0;
+      }
+
+      body * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      .map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="comparison-container">
+      <div id="before" class="map"></div>
+      <div id="after" class="map"></div>
+    </div>
+
+    <script>
+      let currentMapsAndControls = [];
+
+      const setUpMapsAndControls = (config) => {
+        const beforeMap = new maplibregl.Map({
+          container: "before",
+          style: config.leftMapStyle,
+          center: config.center,
+          zoom: config.zoom,
+        });
+        currentMapsAndControls.push(beforeMap);
+
+        const afterMap = new maplibregl.Map({
+          container: "after",
+          style: config.rightMapStyle,
+          center: config.center,
+          zoom: config.zoom,
+        });
+        currentMapsAndControls.push(afterMap);
+
+        const map = new maplibregl.Compare(
+          beforeMap,
+          afterMap,
+          "#comparison-container"
+        );
+        currentMapsAndControls.push(map);
+      };
+
+      const clearMapsAndControls = () => {
+        currentMapsAndControls.forEach((x) => x.remove());
+        currentMapsAndControls = [];
+      };
+
+      const setQueryString = (config) => {
+        const newQueryString = new URLSearchParams(window.location.search);
+        newQueryString.set("config", btoa(JSON.stringify(config)));
+        window.location.search = newQueryString.toString();
+      };
+
+      const defaultConfig = {
+        // MapLibre map style https://maplibre.org/maplibre-style-spec/root/
+        leftMapStyle: {
+          version: 8,
+          sources: {
+            leftSource: {
+              type: "raster",
+              tiles: [
+                // Get an API key from https://basemaps.linz.govt.nz/
+                "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+              ],
+              tileSize: 256,
+            },
+          },
+          layers: [
+            {
+              id: "1",
+              type: "raster",
+              source: "leftSource",
+              minzoom: 0,
+              maxzoom: 20,
+            },
+          ],
+        },
+        rightMapStyle: {
+          version: 8,
+          sources: {
+            rightSource: {
+              type: "raster",
+              tiles: [
+                "https://basemaps.linz.govt.nz/v1/tiles/aerial/WebMercatorQuad/{z}/{x}/{y}.webp?api=",
+              ],
+              tileSize: 256,
+            },
+          },
+          layers: [
+            {
+              id: "1",
+              type: "raster",
+              source: "rightSource",
+              minzoom: 0,
+              maxzoom: 20,
+            },
+          ],
+        },
+        center: [175.52436631107616, -37.65870903235669],
+        zoom: 15,
+      };
+
+      const providedConfig = new URLSearchParams(window.location.search).get(
+        "config"
+      );
+      if (providedConfig !== null) {
+        const parsedProvidedConfig = JSON.parse(atob(providedConfig));
+        setUpMapsAndControls(parsedProvidedConfig);
+      } else {
+        setQueryString(defaultConfig);
+        setUpMapsAndControls(defaultConfig);
+      }
+
+      document.addEventListener("keyup", (event) => {
+        if (event.code === "KeyC") {
+          const answer = window.prompt("Paste JSON config");
+          const answerConfig = JSON.parse(answer);
+          clearMapsAndControls();
+          setUpMapsAndControls(answerConfig);
+          setQueryString(answerConfig);
+        }
+      });
+    </script>
+  </body>
+</html>
